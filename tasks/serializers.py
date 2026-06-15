@@ -33,6 +33,22 @@ class TaskSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def validate(self, attrs):
+        """
+        Общая валидация объекта задачи.
+
+        Проверяет, что задача не может быть родительской
+        задачей для самой себя.
+        """
+        parent_task = attrs.get('parent_task')
+
+        if parent_task and self.instance and parent_task.id == self.instance.id:
+            raise serializers.ValidationError(
+                {'parent_task': 'Задача не может быть родительской для самой себя.'}
+            )
+
+        return attrs
+
 
 class ImportantTaskSerializer(serializers.Serializer):
     """
